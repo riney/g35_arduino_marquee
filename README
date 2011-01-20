@@ -1,0 +1,21 @@
+G35 LED Scrolling Marquee
+Project by John Riney and Jason Beeland
+Concept and Engineering by John Riney
+Code by Jason Beeland
+
+Youtube video of this marquee in action:
+http://www.youtube.com/watch?v=WbtTBSTp0hk
+
+This was a 48 hour new years project Riney and I put together in order to
+take a functioning display to a friend's house for a new years eve party.
+All work, start to finish was completed in that time span.  The only
+additions after the fact are renaming a few variables for clarity and
+documentation of the code.
+
+I had a ton of fun working on this project with Riney.  I learned a great
+deal, and hope that in sharing this code others will have the same fun in
+expanding on what we've done here.
+
+Feel free to use this code in any and all endevors; all I ask is that if
+you lift code for reuse from here you post your own code for others to
+benefit from as well.
