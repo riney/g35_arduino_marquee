@@ -367,27 +367,41 @@ void loop() {
   byte my_r;
   byte my_g;
   byte my_b;
-  while (1) {
-    color_base = random(1, 3);
-    
-    switch (color_base) {
-      case 1:
-        my_r = random(13, 15);
-        my_g = random(0, 3);
-        my_b = random(0, 3);
-        break;
-      case 2:
-        my_g = random(13, 15);
-        my_r = random(0, 3);
-        my_b = random(0, 3);
-        break;
-      case 3:
-        my_b = random(13, 15);
-        my_g = random(0, 3);
-        my_r = random(0, 3);
-        break;
+  int xpos = 0;
+  int ypos = 0;
+  while(ypos < matrixHeight) {
+    while(xpos < matrixWidth) {
+      bufferMatrix[xpos][ypos].color.r = random(0, 15);
+      bufferMatrix[xpos][ypos].color.g = random(0, 15);
+      bufferMatrix[xpos][ypos].color.b = random(0, 15);
+      bufferMatrix[xpos][ypos].i = random(0, 200);
+      xpos++;
     }
-    blitTextDisplay("EVERY DAY I'M SHUFFLING   ", 100, 1, 13, 13, 13, 200, my_r, my_g, my_b, 200);
+    xpos = 0;
+    ypos++;
+  }
+  updateStrands();
+  while (1) {
+    xpos = 0;
+    ypos = 0;
+    while(ypos < matrixHeight) {
+      while(xpos < matrixWidth) {
+        if (bufferMatrix[xpos][ypos].i > 0) {
+          bufferMatrix[xpos][ypos].i--;
+        }
+        else {
+          bufferMatrix[xpos][ypos].color.r = random(0, 15);
+          bufferMatrix[xpos][ypos].color.g = random(0, 15);
+          bufferMatrix[xpos][ypos].color.b = random(0, 15);
+          bufferMatrix[xpos][ypos].i = random(50, 200);
+        }
+        xpos++;
+      }
+      xpos = 0;
+      ypos++;
+    }
+    
+    updateStrands();
   }
 }
 
