@@ -1,12 +1,9 @@
 // -*- c++ -*-
 
 #include <G35.h>
-#include "isin.cpp"
 
 G35 g35;
-uint8_t r = 15;
-uint8_t g = 6;
-uint8_t b = 0;
+uint8_t r, g, b;
 uint8_t i = 204;
 
 int8_t r_direction = -1;
@@ -21,8 +18,11 @@ uint8_t state = 0;
 
 void setup() {
   g35.setup();
-  Serial.begin(115200);
-  g35.clear(13, 13, 13, 100);
+  
+  randomSeed(analogRead(0));
+  r = random(16);
+  g = random(16);
+  b = random(16);
 }
 
 void loop() {
@@ -34,10 +34,12 @@ void loop() {
     g35.clear(r, g, b, i);
   }
   
-  //if ((change_counter % 10) == 0) {
-  //  delay(1000);
-  //}
-  //clamp(change_counter, 100, 1);
+  if (change_counter == 99) {
+    r_direction = r_direction * -1;
+    g_direction = g_direction * -1;
+    b_direction = b_direction * -1;
+  }
+  clamp(change_counter, 100, 1);
 }
 
 void roll(uint8_t &value, int8_t &direction, uint8_t max, uint8_t step) {

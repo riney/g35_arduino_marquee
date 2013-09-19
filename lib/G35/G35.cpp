@@ -3,9 +3,9 @@
 
 /* g35 shash */
 struct rgb_value {
-  byte r;
-  byte g;
-  byte b;
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
 };
 
 struct bulb {
@@ -100,12 +100,16 @@ void G35::clear(uint8_t r, uint8_t g, uint8_t b, uint8_t i) {
   }
 }
     
-void G35::setBrightness(byte brightness) {
+void G35::setBrightness(uint8_t brightness) {
   uint8_t currentStrand = 0;
   while (currentStrand < strandCount) {
     sendBulbPacket(63, strandPin[currentStrand], 0, 0, 0, brightness);
     currentStrand++;
   }
+}
+
+void G35::set(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t i) {
+  sendBulbPacket(bulbMatrix[x][y].address, bulbMatrix[x][y].pin, r, g, b, i);  
 }
 
 //Steps through the frame buffer, checking to see if each bulb needs updating.  If so it copies the new bulb state
