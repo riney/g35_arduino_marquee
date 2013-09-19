@@ -9,24 +9,24 @@ struct rgb_value {
 };
 
 struct bulb {
-  byte address;
-  int pin;
+  uint8_t address;
+  uint8_t pin;
   rgb_value color;
-  byte i;
+  uint8_t i;
 };
 
 /*  Dimensions of the matrix (in bulbs) */
-const int matrixWidth = 18;
-const int matrixHeight = 10;
+const uint8_t matrixWidth = 18;
+const uint8_t matrixHeight = 10;
 
 /*  The number of strands used to form the matrix. */
-const int strandCount = 5;
+const uint8_t strandCount = 5;
 
 /*  The number of bulbs on each strand. */
-const int strandLength = 36;
+const uint8_t strandLength = 36;
 
 /* The digital pins assigned to the strand data lines. */
-const int strandPin[strandCount] = { 22, 24, 26, 28, 30 };
+const uint8_t strandPin[strandCount] = { 22, 24, 26, 28, 30 };
 
 /*
     SPECIAL NOTE - READ THIS IF NOTHING ELSE!!!!
@@ -86,15 +86,13 @@ void G35::setup() {
 //  Called by blitTextDisplay().  (to set the initial background when beginning text display)
 //  Note, only acts on the frame buffer, does not communicate to bulbs.
 
-void G35::clear(int r, int g, int b, int i) {
-  int xpos = 0;
-  int ypos = 0;
+void G35::clear(uint8_t r, uint8_t g, uint8_t b, uint8_t i) {
+  uint8_t xpos = 0;
+  uint8_t ypos = 0;
   while(ypos < matrixHeight) {
     while(xpos < matrixWidth) {
-      bufferMatrix[xpos][ypos].color.r = r;
-      bufferMatrix[xpos][ypos].color.g = g;
-      bufferMatrix[xpos][ypos].color.b = b;
-      bufferMatrix[xpos][ypos].i = i;
+      sendBulbPacket(bulbMatrix[xpos][ypos].address, bulbMatrix[xpos][ypos].pin, r, g, b, i);
+
       xpos++;
     }
     xpos = 0;
@@ -103,15 +101,10 @@ void G35::clear(int r, int g, int b, int i) {
 }
     
 void G35::setBrightness(byte brightness) {
-  int xpos = 0;
-  int ypos = 0;
-  while(ypos < matrixHeight) {
-    while(xpos < matrixWidth) {
-      bufferMatrix[xpos][ypos].i = brightness;
-      xpos++;
-    }
-    xpos = 0;
-    ypos++;
+  uint8_t currentStrand = 0;
+  while (currentStrand < strandCount) {
+    sendBulbPacket(63, strandPin[currentStrand], 0, 0, 0, brightness);
+    currentStrand++;
   }
 }
 
@@ -120,14 +113,10 @@ void G35::setBrightness(byte brightness) {
 //  Called by setup() (for updated the test pattern on boot time) and blitTextDisplay(). 
 
 void G35::draw() {
-  int xpos = 0;
-  int ypos = 0;
+  uint8_t xpos = 0;
+  uint8_t ypos = 0;
   while(ypos < matrixHeight) {
     while(xpos < matrixWidth) {
-      bulbMatrix[xpos][ypos].color.r = bufferMatrix[xpos][ypos].color.r;
-      bulbMatrix[xpos][ypos].color.g = bufferMatrix[xpos][ypos].color.g;
-      bulbMatrix[xpos][ypos].color.b = bufferMatrix[xpos][ypos].color.b;
-      bulbMatrix[xpos][ypos].i = bufferMatrix[xpos][ypos].i;
       sendBulbPacket(bulbMatrix[xpos][ypos].address, bulbMatrix[xpos][ypos].pin, bulbMatrix[xpos][ypos].color.r, bulbMatrix[xpos][ypos].color.g, bulbMatrix[xpos][ypos].color.b, bulbMatrix[xpos][ypos].i);
       xpos++;
     }
@@ -141,10 +130,10 @@ void G35::draw() {
 //  Called by setup().
 
 void G35::addressMatrix() {
-  int addr;
-  int xpos = 0;
-  int ypos = 0;
-  int currentStrand = 0;
+  uint8_t addr;
+  uint8_t xpos = 0;
+  uint8_t ypos = 0;
+  uint8_t currentStrand = 0;
   while (currentStrand < strandCount) {
     addr = 0;
     while (addr < strandLength) {
@@ -156,7 +145,7 @@ void G35::addressMatrix() {
       bulbMatrix[xpos][ypos].i = 0;
 
       sendBulbPacket(bulbMatrix[xpos][ypos].address, bulbMatrix[xpos][ypos].pin, bulbMatrix[xpos][ypos].color.r, bulbMatrix[xpos][ypos].color.g, bulbMatrix[xpos][ypos].color.b, bulbMatrix[xpos][ypos].i);
-      delay(1);
+
       if ((ypos & 1) == 0) {
         if (xpos < (matrixWidth - 1)) {
           xpos++;
@@ -179,10 +168,10 @@ void G35::addressMatrix() {
 //Generates data stream from defined values and then transmits that data to the defined bulb.
 //  Called by addressMatrix() and updateStrands().
 
-void G35::sendBulbPacket(byte address, int pin, byte r, byte g, byte b, byte i) {
+void G35::sendBulbPacket(uint8_t address, uint8_t pin, uint8_t r, uint8_t g, uint8_t b, uint8_t i) {
   boolean streamBuffer[26];
-  int streamPos = 0;
-  int bitPos;
+  uint8_t streamPos = 0;
+  uint8_t bitPos;
   int currentData;
   //Simple state machine to step through the data to set up a stream buffer we will use to quickly transmit the data.
   //Note that you _could_ roll the bit transmission into this also, but timing would become trickier, as you would need
